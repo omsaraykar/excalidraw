@@ -23,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`vsc-initialized ${geistSans.variable} ${geistMono.variable}`}>
         {children}
       </body>
     </html>
