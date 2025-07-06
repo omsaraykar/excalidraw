@@ -1,5 +1,5 @@
 {
-  "name": "excalidraw",
+  "name": "@main/excalidraw",
   "private": true,
   "scripts": {
     "build": "turbo run build",
