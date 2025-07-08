@@ -2,9 +2,9 @@ import { Request, Response } from 'express';
 import { prisma } from '@repo/db/prisma-client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { signupSchema, signinSchema } from './../schemas/auth.schema';
+import { signupSchema, signinSchema } from '@repo/common/schema';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
+const JWT_SECRET = process.env.JWT_SECRET || 'q3945ujoasflasdfals345=';
 
 export const signUpUser = async (req: Request, res: Response): Promise<void> => {
   const result = signupSchema.safeParse(req.body);

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { createRoomSchema } from '@repo/common/schema';
 
 export const getRoom = async (req: Request, res: Response) => {
   // Get room logic
