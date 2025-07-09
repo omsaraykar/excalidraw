@@ -4,9 +4,9 @@ import { verifyToken } from './../middlewares/auth.middleware'
 
 const router: Router = express.Router();
 
-router.get('/room', verifyToken, getRoom);
-router.post('/room', verifyToken, createRoom);
-router.put('/room', verifyToken, updateRoom);
-router.delete('/room', verifyToken, deleteRoom);
+router.get('/:roomId', verifyToken, getRoom);
+router.post('/', verifyToken, createRoom);
+router.put('/', verifyToken, updateRoom);
+router.delete('/', verifyToken, deleteRoom);
 
 export default router;

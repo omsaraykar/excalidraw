@@ -1,13 +1,51 @@
 import { Request, Response } from 'express';
-import { createRoomSchema } from '@repo/common/schema';
+import { CreateRoomSchema } from '@repo/common/schema';
+import { prisma } from '@repo/db/prisma-client';
 
 export const getRoom = async (req: Request, res: Response) => {
-  // Get room logic
-  res.json({ message: "Get Room" });
+  try {
+    const roomId = Number(req.params.roomId);
+    const messages = await prisma.chat.findMany({
+      where: {
+        roomId: roomId
+      },
+      orderBy: {
+        id: "desc"
+      },
+      take: 100
+    });
+
+    res.json({
+      messages
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.json({
+      messages: []
+    });
+  }
 };
 
 export const createRoom = async (req: Request, res: Response) => {
-  // Create room logic
+  const parsedData = CreateRoomSchema.safeParse(req.body);
+
+  if (!parsedData.success) {
+    res.json({
+      message: "Incorrect Inputs"
+    });
+    return;
+  }
+
+  const userId = req.userId;
+
+  await prisma.room.create({
+    data: {
+      slug: parsedData.data.name,
+      adminId: userId
+    }
+  })
+
   res.json({ message: "Room created" });
 };
 
@@ -17,6 +55,21 @@ export const updateRoom = async (req: Request, res: Response) => {
 };
 
 export const deleteRoom = async (req: Request, res: Response) => {
-  // Delete logic
-  res.json({ message: "Room deleted" });
+  // Update logic
+  res.json({ message: "Room updated" });
 };
+
+export const getRoomBySlug = async (req: Request, res: Response) => {
+  const slug = req.params.slug;
+  const room = await prisma.room.findFirst({
+    where: {
+      slug
+    }
+  });
+
+  res.json({
+    room
+  });
+};
+
+
