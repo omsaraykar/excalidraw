@@ -1,0 +1,10 @@
+{
+  "extends": "@main/excalidraw/turbo",
+  "tasks": {
+    "build": {
+      "outputs": [
+        "dist/**"
+      ]
+    }
+  }
+}
