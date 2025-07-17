@@ -1,31 +1,36 @@
-type Shape =
-  | {
-    type: "rect";
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  }
-  | {
-    type: "circle";
-    centerX: number;
-    centerY: number;
-    radius: number;
-  }
-  | {
-    type: "pencil";
-    startX: number;
-    startY: number;
-    endX: number;
-    endY: number;
-  };
+import { Tool } from "@/types/tool";
 
-export default function initDraw(canvas: HTMLCanvasElement) {
+interface Rect {
+  type: "rect";
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface Circle {
+  type: "circle";
+  centerX: number;
+  centerY: number;
+  radius: number;
+}
+
+interface Pencil {
+  type: "pencil";
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+}
+
+type Shape = Rect | Circle | Pencil;
+
+
+export default function initDraw(canvas: HTMLCanvasElement, selectedTool: Tool) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-  let existingShapes: Shape[] = [];
-
+  let shapes: Shape[] = []; // get shapes from db
   let isDrawing = false;
   let start = { x: 0, y: 0 };
 
@@ -42,51 +47,59 @@ export default function initDraw(canvas: HTMLCanvasElement) {
     ctx.lineWidth = 2;
     ctx.strokeStyle = "black";
 
-    if (shape.type === "rect") {
-      ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
-    } else if (shape.type === "circle") {
-      ctx.arc(shape.centerX, shape.centerY, shape.radius, 0, Math.PI * 2);
-      ctx.stroke();
-    } else if (shape.type === "pencil") {
-      ctx.moveTo(shape.startX, shape.startY);
-      ctx.lineTo(shape.endX, shape.endY);
-      ctx.stroke();
+    switch (shape.type) {
+      case "rect":
+        ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
+        break;
+      case "circle":
+        ctx.arc(shape.centerX, shape.centerY, shape.radius, 0, Math.PI * 2);
+        ctx.stroke();
+        break;
+      case "pencil":
+        ctx.moveTo(shape.startX, shape.startY);
+        ctx.lineTo(shape.endX, shape.endY);
+        ctx.stroke();
+        break;
     }
+
+    ctx.closePath();
   };
 
-  const drawAllShapes = () => {
+  const redrawCanvas = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    existingShapes.forEach(drawShape);
+    shapes.forEach(drawShape);
   };
 
   const handleMouseDown = (e: MouseEvent) => {
-    const pos = getMousePos(e);
-    start = pos;
+    start = getMousePos(e);
     isDrawing = true;
   };
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!isDrawing) return;
 
-    const pos = getMousePos(e);
-    const width = pos.x - start.x;
-    const height = pos.y - start.y;
+    const { x, y } = getMousePos(e);
+    const width = x - start.x;
+    const height = y - start.y;
 
-    drawAllShapes();
+    redrawCanvas();
+
+    // Show preview rectangle
+    ctx.beginPath();
     ctx.strokeStyle = "gray";
     ctx.lineWidth = 1;
     ctx.strokeRect(start.x, start.y, width, height);
+    ctx.closePath();
   };
 
   const handleMouseUp = (e: MouseEvent) => {
     if (!isDrawing) return;
     isDrawing = false;
 
-    const pos = getMousePos(e);
-    const width = pos.x - start.x;
-    const height = pos.y - start.y;
+    const { x, y } = getMousePos(e);
+    const width = x - start.x;
+    const height = y - start.y;
 
-    // Save shape
     const newShape: Shape = {
       type: "rect",
       x: start.x,
@@ -94,26 +107,14 @@ export default function initDraw(canvas: HTMLCanvasElement) {
       width,
       height,
     };
-    existingShapes.push(newShape);
 
-    drawAllShapes();
+    shapes.push(newShape);
+    redrawCanvas();
   };
 
   canvas.addEventListener("mousedown", handleMouseDown);
   canvas.addEventListener("mousemove", handleMouseMove);
   canvas.addEventListener("mouseup", handleMouseUp);
-
-  // -------- Helper functions --------
-
-  function clearCanvas() {
-    if (!ctx) return null;
-    existingShapes = [];
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-
-  function getExistingShapes() {
-    return [...existingShapes];
-  }
 
   return {
     destroy: () => {
@@ -121,7 +122,10 @@ export default function initDraw(canvas: HTMLCanvasElement) {
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseup", handleMouseUp);
     },
-    clearCanvas,
-    getExistingShapes,
+    clearCanvas: () => {
+      shapes = [];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    },
+    getExistingShapes: () => [...shapes],
   };
 }
