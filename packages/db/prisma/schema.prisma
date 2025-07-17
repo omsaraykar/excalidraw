@@ -15,7 +15,7 @@ model User {
   avatar      String?
   createdAt   DateTime    @default(now())
   rooms       Room[]
-  chats       Chat[]
+  drawings    Drawing[]
 }
 
 model Room {
@@ -24,14 +24,57 @@ model Room {
   adminId     String
   admin       User        @relation(fields: [adminId], references: [id])
   createdAt   DateTime    @default(now())
-  chats       Chat[]
+  drawings    Drawing[]
 }
 
-model Chat {
-  id          Int         @id @default(autoincrement())
-  roomId      Int
-  message     String
-  senderId    String
-  room        Room        @relation(fields: [roomId], references: [id])
-  sender      User        @relation(fields: [senderId], references: [id])
+model Drawing {
+  id        Int      @id @default(autoincrement())
+  roomId    Int
+  senderId  String
+
+  shapeType ShapeType
+
+  rectId    String?  @unique
+  rect      Rect?    @relation(fields: [rectId], references: [id])
+
+  circleId  String?  @unique
+  circle    Circle?  @relation(fields: [circleId], references: [id])
+
+  pencilId  String?  @unique
+  pencil    Pencil?  @relation(fields: [pencilId], references: [id])
+
+  room      Room     @relation(fields: [roomId], references: [id])
+  sender    User     @relation(fields: [senderId], references: [id])
+}
+
+enum ShapeType {
+  RECT
+  CIRCLE
+  PENCIL
+}
+
+model Rect {
+  id        String   @id @default(cuid())
+  x         Float
+  y         Float
+  width     Float
+  height    Float
+  drawing   Drawing?
+}
+
+model Circle {
+  id        String   @id @default(cuid())
+  centerX   Float
+  centerY   Float
+  radius    Float
+  drawing   Drawing?
+}
+
+model Pencil {
+  id        String   @id @default(cuid())
+  startX    Float
+  startY    Float
+  endX      Float
+  endY      Float
+  drawing   Drawing?
 }
