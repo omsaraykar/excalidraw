@@ -4,8 +4,8 @@ import { getDrawings } from '../controllers/drawing.controller';
 
 const router: Router = express.Router();
 
-router.get('/:roomId', verifyToken, (req, res, next) => {
-  getDrawings(req, res).catch(next);
+router.get('/:roomId', (req, res) => {
+  getDrawings(req, res);
 });
 
 export default router;

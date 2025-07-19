@@ -2,8 +2,14 @@ import express from 'express';
 import userRoutes from './routes/user.routes'
 import roomRoutes from './routes/room.routes'
 import drawingRoutes from './routes/drawing.routes'
+import cors from 'cors';
 
 const app = express();
+
+app.use(cors({
+    origin: 'http://localhost:3001',
+    credentials: true,
+}));
 
 app.use('/api/v1/users', userRoutes);
 app.use('/api/vi/rooms', roomRoutes);
