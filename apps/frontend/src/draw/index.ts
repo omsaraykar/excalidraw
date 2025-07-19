@@ -1,4 +1,5 @@
 import { Tool } from "@/types/tool";
+import { getShapesFromDb } from "./get-shapes";
 
 interface Rect {
   type: "rect";
@@ -23,14 +24,16 @@ interface Pencil {
   endY: number;
 }
 
-type Shape = Rect | Circle | Pencil;
+export type Shape = Rect | Circle | Pencil;
 
 
-export default function initDraw(canvas: HTMLCanvasElement, selectedTool: Tool) {
+export default async function initDraw(canvas: HTMLCanvasElement, selectedTool: Tool, roomId: number) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-  let shapes: Shape[] = []; // get shapes from db
+  const socket = new WebSocket("ws://localhost:8080");
+
+  let shapes: Shape[] = await getShapesFromDb(roomId);
   let isDrawing = false;
   let start = { x: 0, y: 0 };
 
@@ -109,6 +112,13 @@ export default function initDraw(canvas: HTMLCanvasElement, selectedTool: Tool) 
     };
 
     shapes.push(newShape);
+    socket.send(JSON.stringify({
+      type: "draw",
+      shapeType: "RECT",
+      roomId: roomId,
+      shapeData: newShape
+    }))
+
     redrawCanvas();
   };
 

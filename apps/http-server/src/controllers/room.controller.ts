@@ -5,7 +5,7 @@ import { prisma } from '@repo/db/prisma-client';
 export const getRoom = async (req: Request, res: Response) => {
   try {
     const roomId = Number(req.params.roomId);
-    const messages = await prisma.chat.findMany({
+    const drawings = await prisma.drawing.findMany({
       where: {
         roomId: roomId
       },
@@ -16,7 +16,7 @@ export const getRoom = async (req: Request, res: Response) => {
     });
 
     res.json({
-      messages
+      drawings
     });
 
   } catch (error) {

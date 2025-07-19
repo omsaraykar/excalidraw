@@ -10,10 +10,46 @@ interface UserSocket {
   ws: WebSocket;
 }
 
-const users: UserSocket[] = []; // get from db
+interface Drawing {
+  roomId: number;
+  shapeType: 'RECT' | 'CIRCLE' | 'PENCIL';
+  senderId: string;
+  rect?: Rect;
+  circle?: Circle;
+  pencil?: Pencil;
+  rectId?: string;
+  circleId?: string;
+  pencilId?: string;
+}
+
+interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  drawing: Drawing;
+}
+
+interface Circle {
+  centerX: number;
+  centerY: number;
+  radius: number;
+  drawing: Drawing;
+}
+
+interface Pencil {
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+  drawing: Drawing;
+}
+
+const users: UserSocket[] = [];
 
 wss.on('connection', async (ws, request) => {
-  const userId = CheckUser(request);
+  // const userId = CheckUser(request);
+  const userId = '123';
 
   if (!userId) {
     ws.close();
@@ -57,7 +93,7 @@ wss.on('connection', async (ws, request) => {
       const shapeData = parsedData.shape;
 
       try {
-        const drawingData: any = {
+        const drawingData: Drawing = {
           roomId,
           shapeType,
           senderId: user.userId,
@@ -74,7 +110,17 @@ wss.on('connection', async (ws, request) => {
           drawingData.pencilId = pencil.id;
         }
 
-        await prisma.drawing.create({ data: drawingData });
+        await prisma.drawing.create({ data: {
+          roomId: roomId,
+          senderId: user.userId,
+          shapeType: shapeType,
+          rect: shapeData.rect,
+          circle: shapeData.circle,
+          pencil: shapeData.pencil,
+          rectId: shapeData.rect?.id,
+          circleId: shapeData.circle?.id,
+          pencilId: shapeData.pencil?.id,
+        } });
 
         // Broadcast to all users in the room
         users.forEach((u) => {
