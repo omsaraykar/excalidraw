@@ -1,4 +1,4 @@
-import { Tool } from "@/types/tool";
+import { Tool } from "@/types/types";
 import { getShapesFromDb } from "./get-shapes";
 
 interface Rect {
@@ -33,7 +33,7 @@ export default async function initDraw(canvas: HTMLCanvasElement, selectedTool: 
 
   const socket = new WebSocket("ws://localhost:8080");
 
-  let shapes: Shape[] = await getShapesFromDb(roomId);
+  let shapes: Shape[] = await getShapesFromDb(roomId) as Shape[];
   let isDrawing = false;
   let start = { x: 0, y: 0 };
 

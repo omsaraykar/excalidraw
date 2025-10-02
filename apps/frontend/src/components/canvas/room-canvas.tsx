@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Toolbar from "@/components/canvas/toolbar";
 import initDraw from "@/draw/index";
-import { Tool } from "@/types/tool";
+import { Tool } from "@/types/types";
 
 export default function RoomCanvas({ roomId }: { roomId: string }) {
   const [selectedTool, setSelectedTool] = useState<Tool>(Tool.RECT);

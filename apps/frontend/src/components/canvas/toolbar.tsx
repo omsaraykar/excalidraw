@@ -1,5 +1,5 @@
 import { JSX } from "react";
-import { Tool } from "@/types/tool";
+import { Tool } from "@/types/types";
 import {
   Square,
   Circle,

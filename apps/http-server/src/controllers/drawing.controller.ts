@@ -8,9 +8,8 @@ export const getDrawings = async (req: Request, res: Response) => {
   }
 
   const drawings = await prisma.drawing.findMany({
-    where: {
-      roomId: roomId
-    }
+    where: { roomId: Number(roomId) },
+    include: { rect: true, circle: true, pencil: true },
   });
 
   res.json({
